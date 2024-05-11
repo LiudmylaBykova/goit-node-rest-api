@@ -44,7 +44,7 @@ async function addContact({ name, email, phone }) {
   return newContact;
 }
 
-async function updateContact(id, { name, email, phone }) {
+async function updateContact(id, body) {
   const contacts = await listContacts();
   const index = contacts.findIndex((contact) => contact.id === id);
   if (index === -1) {
@@ -52,9 +52,7 @@ async function updateContact(id, { name, email, phone }) {
   }
   const updatedContact = {
     ...contacts[index],
-    name: name !== undefined ? name : contacts[index].name,
-    email: email !== undefined ? email : contacts[index].email,
-    phone: phone !== undefined ? phone : contacts[index].phone,
+    ...body,
   };
   const newContacts = [
     ...contacts.slice(0, index),
