@@ -1,5 +1,7 @@
 import { Schema, model } from "mongoose";
 
+const telRegexp = /^\([0-9]{3}\) [0-9]{3}\-[0-9]{4}$/;
+
 const contactSchema = new Schema(
   {
     name: {
@@ -13,11 +15,15 @@ const contactSchema = new Schema(
     phone: {
       type: String,
       required: [true, "Set phone for contact"],
-      match: /^\([0-9]{3}\) [0-9]{3}\-[0-9]{4}$/,
+      match: telRegexp,
     },
     favorite: {
       type: Boolean,
       default: false,
+    },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
     },
   },
   { versionKey: false, timestamps: true }

@@ -8,33 +8,49 @@ import {
   updateStatusContact,
 } from "../controllers/contactsControllers.js";
 
-import validateBody from "../helpers/validateBody.js";
+import validateBody from "../middlewares/validateBody.js";
 import {
   createContactSchema,
   updateContactSchema,
   updateStatusSchema,
 } from "../schemas/contactSchemas.js";
 
-import isValidId from "../helpers/isValidId.js";
+import { isEmptyBoby } from "../middlewares/isEmptyBody.js";
+
+import isValidId from "../middlewares/isValidId.js";
+import authMiddleware from "../middlewares/auth.js";
+
+const jsonParser = express.json();
 
 const contactsRouter = express.Router();
 
-contactsRouter.get("/", getAllContacts);
+contactsRouter.get("/", authMiddleware, getAllContacts);
 
-contactsRouter.get("/:id", isValidId, getOneContact);
+contactsRouter.get("/:id", authMiddleware, isValidId, getOneContact);
 
-contactsRouter.delete("/:id", isValidId, deleteContact);
+contactsRouter.delete("/:id", authMiddleware, isValidId, deleteContact);
 
-contactsRouter.post("/", validateBody(createContactSchema), createContact);
+contactsRouter.post(
+  "/",
+  authMiddleware,
+  jsonParser,
+  validateBody(createContactSchema),
+  createContact
+);
 
 contactsRouter.put(
   "/:id",
+  authMiddleware,
+  jsonParser,
   isValidId,
+  isEmptyBoby,
   validateBody(updateContactSchema),
   updateContact
 );
 contactsRouter.patch(
   "/:id/favorite",
+  authMiddleware,
+  jsonParser,
   isValidId,
   validateBody(updateStatusSchema),
   updateStatusContact
