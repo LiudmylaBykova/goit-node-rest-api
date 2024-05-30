@@ -7,6 +7,7 @@ import {
   logout,
   current,
   updateSubscription,
+  updateAvatar,
 } from "../controllers/authControllers.js";
 import validateBody from "../middlewares/validateBody.js";
 import {
@@ -15,6 +16,7 @@ import {
   updateSubscriptionSchema,
 } from "../schemas/authSchemas.js";
 import authMiddleware from "../middlewares/auth.js";
+import uploadMiddleware from "../middlewares/upload.js";
 
 const jsonParser = express.json();
 
@@ -26,13 +28,20 @@ authRouter.post(
 );
 authRouter.post("/login", jsonParser, validateBody(loginSchema), login);
 authRouter.get("/current", authMiddleware, current);
-authRouter.get("/logout", authMiddleware, logout);
+authRouter.post("/logout", authMiddleware, logout);
 authRouter.patch(
   "/users",
   authMiddleware,
   jsonParser,
   validateBody(updateSubscriptionSchema),
   updateSubscription
+);
+
+authRouter.patch(
+  "/avatars",
+  authMiddleware,
+  uploadMiddleware.single("avatar"),
+  updateAvatar
 );
 
 export default authRouter;

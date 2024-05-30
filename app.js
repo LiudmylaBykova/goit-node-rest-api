@@ -1,4 +1,5 @@
 import express from "express";
+import path from "node:path";
 import morgan from "morgan";
 import cors from "cors";
 import mongoose from "mongoose";
@@ -11,6 +12,8 @@ const app = express();
 
 app.use(morgan("tiny"));
 app.use(cors());
+
+app.use("/avatars", express.static(path.resolve("public/avatars")));
 
 app.use("/api/contacts", contactsRouter);
 app.use("/api/users", authRouter);

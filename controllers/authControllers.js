@@ -1,8 +1,12 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import gravatar from "gravatar";
+import fs from "node:fs/promises";
+import path from "node:path";
 
 import HttpError from "../helpers/HttpError.js";
 import { User } from "../models/user.js";
+import jimpAvatar from "../helpers/jimpAvatar.js";
 
 const { SECRET_KEY } = process.env;
 
@@ -14,7 +18,12 @@ export const register = async (req, res, next) => {
       throw HttpError(409, "Email in use");
     }
     const passwordHash = await bcrypt.hash(password, 10);
-    const newUser = await User.create({ email, password: passwordHash });
+    const avatarURL = gravatar.url(email);
+    const newUser = await User.create({
+      email,
+      password: passwordHash,
+      avatarURL,
+    });
     return res
       .status(201)
       .json({ email: newUser.email, subscription: newUser.subscription });
@@ -80,9 +89,34 @@ export const updateSubscription = async (req, res, next) => {
       { subscription },
       { new: true }
     );
+    if (updated === null) {
+      throw HttpError(404, "Not found");
+    }
     return res
       .status(200)
       .json({ email: updated.email, subscription: updated.subscription });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateAvatar = async (req, res, next) => {
+  try {
+    const { id } = req.user;
+    const { filename } = req.file;
+    const newPath = path.resolve("public", "avatars", req.file.filename);
+    await jimpAvatar(req.file.path);
+    await fs.rename(req.file.path, newPath);
+    const avatarURL = path.join("avatars", filename);
+    const updated = await User.findByIdAndUpdate(
+      id,
+      { avatarURL },
+      { new: true }
+    );
+    if (updated === null) {
+      throw HttpError(404, "Not found");
+    }
+    return res.status(200).json({ avatarUrl: updated.avatarURL });
   } catch (error) {
     next(error);
   }

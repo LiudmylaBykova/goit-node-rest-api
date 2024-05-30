@@ -16,7 +16,6 @@ import {
 } from "../schemas/contactSchemas.js";
 
 import { isEmptyBoby } from "../middlewares/isEmptyBody.js";
-
 import isValidId from "../middlewares/isValidId.js";
 import authMiddleware from "../middlewares/auth.js";
 
