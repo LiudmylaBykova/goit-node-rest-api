@@ -102,6 +102,9 @@ export const updateSubscription = async (req, res, next) => {
 
 export const updateAvatar = async (req, res, next) => {
   try {
+    if (!req.file) {
+      throw HttpError(400, "Avatar is required");
+    }
     const { id } = req.user;
     const { filename } = req.file;
     const newPath = path.resolve("public", "avatars", req.file.filename);
