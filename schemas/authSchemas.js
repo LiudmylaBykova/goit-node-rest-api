@@ -24,6 +24,10 @@ export const loginSchema = Joi.object({
     .messages({ "string.min": "Must be min 8 characters" }),
 });
 
+export const emailSchema = Joi.object({
+  email: Joi.string().pattern(emailRegexp).required(),
+});
+
 export const updateSubscriptionSchema = Joi.object({
   subscription: Joi.string().valid("starter", "pro", "business").required(),
 });

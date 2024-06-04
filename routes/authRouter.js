@@ -1,4 +1,5 @@
 import express from "express";
+
 const authRouter = express.Router();
 
 import {
@@ -8,10 +9,13 @@ import {
   current,
   updateSubscription,
   updateAvatar,
+  verifyEmail,
+  resendVerifyEmail,
 } from "../controllers/authControllers.js";
 import validateBody from "../middlewares/validateBody.js";
 import {
   registerSchema,
+  emailSchema,
   loginSchema,
   updateSubscriptionSchema,
 } from "../schemas/authSchemas.js";
@@ -26,9 +30,22 @@ authRouter.post(
   validateBody(registerSchema),
   register
 );
+
+authRouter.get("/verify/:verificationToken", verifyEmail);
+
+authRouter.post(
+  "/verify",
+  jsonParser,
+  validateBody(emailSchema),
+  resendVerifyEmail
+);
+
 authRouter.post("/login", jsonParser, validateBody(loginSchema), login);
+
 authRouter.get("/current", authMiddleware, current);
+
 authRouter.post("/logout", authMiddleware, logout);
+
 authRouter.patch(
   "/users",
   authMiddleware,
